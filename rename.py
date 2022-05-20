@@ -18,7 +18,7 @@ for nombrearchivo in os.listdir(folder):
     count += 1
     print(str(activados) + " " + "mas mas")
 
-print('New Names are klalalalalala')
+print('New Names are los siguientes')
 # verify the result
 
 # Redirecciona la lista de donde tomará los datos
