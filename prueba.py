@@ -38,6 +38,7 @@ wb.close()
 #### Hacemos For para la cantidad de ingresos
 # dni, nomb = A y B son las columnas  y [0] empieza en la primera columna
 
+
 for i in range(1,20):
     dni, nomb = nombres[f'A{i}:B{i}'][0]
     print(dni.value, nomb.value)
@@ -77,3 +78,7 @@ for i in range(1,20):
 
     driver.find_element_by_name("nombre").clear()
     time.sleep(1)
+
+    #Repositorio para cargar los archivos a Github
+
+        
