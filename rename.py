@@ -33,3 +33,4 @@ df.to_excel ("C:\\Users\\REDMIBOOK 16\\Downloads\\CERTIFICADOS\\CERTIFICADOS\\ex
 print(res)
 
 #Repositorio para cargar los archivos a Github
+#https://github.com/Marlhen/automatizacion_TSICAM.git

@@ -77,3 +77,7 @@ for i in range(1,20):
 
     driver.find_element_by_name("nombre").clear()
     time.sleep(1)
+
+
+#Repositorio para cargar los archivos a Github
+#https://github.com/Marlhen/automatizacion_TSICAM.git
