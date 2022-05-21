@@ -28,7 +28,7 @@ time.sleep(1)
 
 #### Cargamos el excel donde estan los DNI[s]
 
-filesheet = "C:\\Users\\REDMIBOOK 16\\Downloads\\CERTIFICADOS\\CERTIFICADOS\\excel.xlsx"
+filesheet = "C:\\Users\\REDMIBOOK 16\\Downloads\\prueba\\excel.xlsx"
 wb = load_workbook(filesheet)
 hojas = wb.get_sheet_names()
 print(hojas)
@@ -42,42 +42,49 @@ wb.close()
 for i in range(1,20):
     dni, nomb = nombres[f'A{i}:B{i}'][0]
     print(dni.value, nomb.value)
-    time.sleep(3)
+    time.sleep(2)
     driver.find_element_by_name("nombre").send_keys(dni.value)
     driver.find_element_by_name("nombre").send_keys(Keys.ENTER)
-    time.sleep(1)
+    time.sleep(2)
 
     try:
     ## Verifica si el selector existe.
-        item = WebDriverWait(driver, 1).until(EC.presence_of_element_located((By.XPATH,"//a[@title='Reagendar Induccion y Orientacion Básica de Seguridad - Toquepala']")))
+        item = WebDriverWait(driver, 1).until(EC.presence_of_element_located((By.XPATH,"//a[@title='Reagendar Induccion y Orientacion Básica de Seguridad - Cuajone']")))
     #do something with the item...
-        driver.find_element_by_xpath("//a[@title='Reagendar Induccion y Orientacion Básica de Seguridad - Toquepala']").click()
+        driver.find_element_by_xpath("//a[@title='Reagendar Induccion y Orientacion Básica de Seguridad - Cuajone']").click()
         driver.find_element_by_name("fechaSolicitud").clear()
-        time.sleep(1)
-        driver.find_element_by_name("fechaSolicitud").send_keys("11/05/2022")
-        time.sleep(1)
+        time.sleep(2)
+        driver.find_element_by_name("fechaSolicitud").send_keys("21/05/2022")
+        time.sleep(2)
         driver.find_element_by_xpath("(//a[@id='save-modal'])[1]").click()
-        time.sleep(1)
+        time.sleep(2)
         driver.find_element_by_css_selector(".fa.fa-check").click()
-        time.sleep(1)
-        driver.find_element_by_css_selector("#id_anexo").send_keys("C:\\Users\\REDMIBOOK 16\\Downloads\\CERTIFICADOS\\CERTIFICADOS\\"+ str(dni.value) +".pdf")
-        time.sleep(1)
+        time.sleep(2)
+
+        #colocar la nota
+        driver.find_element_by_xpath("(//input[@id='id_calificacion'])[1]").send_keys("17")
+        time.sleep(2)
+
+        #Sube el anexo 4
+
+        driver.find_element_by_css_selector("#id_anexo").send_keys("C:\\Users\\REDMIBOOK 16\\Downloads\\prueba\\"+ str(dni.value) +".pdf")
+        time.sleep(2)
         driver.find_element_by_css_selector("#save-modal").click()
-        time.sleep(3)
+        time.sleep(2)
         
         #driver.find_element_by_xpath("(//a[@class='modal-close waves-effect waves-green btn-flat'][normalize-space()='Cancelar'])[1]").click()
         #time.sleep(1)
         
         driver.find_element_by_name("nombre").clear()
-        time.sleep(1)
+        time.sleep(2)
 
     except TimeoutException as e:
         print("Ya esta activado")
         pass
-        time.sleep(1)
+        time.sleep(2)
 
     driver.find_element_by_name("nombre").clear()
-    time.sleep(1)
+    time.sleep(2)
 
     #Repositorio para cargar los archivos a Github
 
