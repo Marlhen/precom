@@ -1,4 +1,5 @@
 import os, shutil
+
 for root, dirs, files in os.walk("C:\\Users\\REDMIBOOK 16\\Downloads\\OneDrive_2022-05-21\\"):
     for file in files:
         if file[-4:].lower() == '.pdf':

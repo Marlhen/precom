@@ -1,13 +1,21 @@
 ### Automatizaci[o]n con Selenium TSICAM
-### By Marlhen Estrada Dic 2022 Rev 0.3.1
+### By Marlhen Estrada Dic 2022 Rev 0.3.3
+### Fecha: 10.06.2022
+
 from xmlrpc.client import boolean
+from numpy import busday_count, imag
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from win10toast import ToastNotifier
 import pandas as pd
+import os
 import time
+
+######  
+##from Screenshot import Screenshot_Clipping
+from PIL import Image
 
 #### Ingresamos url, usuario y la contrasena.
 
@@ -42,20 +50,21 @@ numerofilas = selecolumdni.count(axis=0)
 aprobados = [] ## lista para guardar los que vamos a aprobados
 yaaprobados = [] ## lista para guardar los ya aprobadeos
 nosistema = [] ## para los que no aparecen en el sistema
+poradministracion = [] ## para los que no aparecen en el sistema
 
 ### For en el rango  0 hasta el numero de filas
 for i in range(0, int(numerofilas)):
     buscarpordni = dnis["dni"][i] ### buscar por dni igual a la fila del Data frame DNI
     print(buscarpordni)
 
-    driver.find_element(by=By.NAME, value="nombre").send_keys(buscarpordni)
-
+    driver.find_element(by=By.NAME, value="nombre").send_keys(str(buscarpordni))
+    time.sleep(3)
     driver.find_element(by=By.NAME, value="nombre").send_keys(Keys.ENTER)
     time.sleep(3)
     
     ## Verifica si el selector existe.
 
-    at = driver.find_elements(by=By.XPATH, value="(//a[@title='Reagendar Induccion y Orientacion Básica de Seguridad - Toquepala'])[1]")
+    at = driver.find_elements(by=By.XPATH, value="(//a[@title='Reagendar Induccion y Orientacion Básica de Seguridad - Cuajone'])[1]")
 
     ###------------------Devuelve si es falso o verdadero el selector buscado
     print(boolean(at))
@@ -63,7 +72,7 @@ for i in range(0, int(numerofilas)):
     if len(at) > 0:
         print ("Voy a activarlos")
         ## Si existe el item lo activa en el sistema
-        driver.find_element(by=By.XPATH, value="(//a[@title='Reagendar Induccion y Orientacion Básica de Seguridad - Toquepala'])[1]").click()
+        driver.find_element(by=By.XPATH, value="(//a[@title='Reagendar Induccion y Orientacion Básica de Seguridad - Cuajone'])[1]").click()
         time.sleep(3)
         driver.find_element(by=By.NAME, value="fechaSolicitud").clear()
         time.sleep(3)
@@ -71,7 +80,7 @@ for i in range(0, int(numerofilas)):
         time.sleep(3)
         driver.find_element(by=By.XPATH, value="(//a[@id='save-modal'])[1]").click()
         time.sleep(3)
-        driver.find_element(by=By.XPATH, value="//i[@class='fa fa-check']").click()
+        driver.find_element(by=By.XPATH, value="(//i[@class='fa fa-check'])[1]").click()
         time.sleep(3)
         #colocar la nota
         driver.find_element(by=By.NAME, value="calificacion").send_keys("18")
@@ -120,18 +129,92 @@ for i in range(0, int(numerofilas)):
             
         else:
           
-            print("No esta en el sistema")
+            print("No esta para aprobar")
             ##### Notificacion dentro del panel
             toaster = ToastNotifier()
-            toaster.show_toast("TSICAM", str(buscarpordni) + " " + "No esta en el sistema", duration=6)
+            toaster.show_toast("TSICAM", str(buscarpordni) + " " + "No esta para aprobar", duration=6)
+        
             ##########
-            nosistema.append(buscarpordni)
-            dfcsc2 = pd.DataFrame(nosistema)
-            dfcsc2.columns = ["No sistema"]
-            dfcsc2.to_csv("C:\\Users\\REDMIBOOK 16\\Downloads\\prueba\\no_sistema.csv", index = False, header=True)
+
+            
+            #####-------------Buscar en que estado el pase...............##########
+
+            driver.get("https://tsicam.southernperu.com.pe/intranet/pases/")
+            time.sleep(2)
+            driver.find_element(by=By.NAME, value="nombre").send_keys(str(buscarpordni))
+            time.sleep(2)
+            driver.find_element(by=By.NAME, value="nombre").send_keys(Keys.ENTER)
+            time.sleep(2)
+
+            atxx = driver.find_elements(by=By.XPATH, value="(//a[normalize-space()='100 %'])[1]")
+
+            if len(atxx) > 0:
+                driver.find_element(by=By.XPATH, value="(//a[normalize-space()='100 %'])[1]").click()
+                time.sleep(2)
+                
+                atyy = driver.find_elements(by=By.XPATH, value="//td[contains(text(),'Esperando aprobación de')]")
+                
+                if len(atyy) > 0:
+                    driver.find_element(by=By.XPATH, value="//td[contains(text(),'Esperando aprobación de')]").click()
+        
+                    #####-------------Captura la pantalla...............##########+
+
+                    ###os.mkdir("C:\\Users\\REDMIBOOK 16\\Downloads\\prueba\\imagenes\\")
+                    driver.save_screenshot("C:\\Users\\REDMIBOOK 16\\Downloads\\prueba\\imagenes\\" + str(buscarpordni) +"_" + "Myimage.png")
+                    driver.get("https://tsicam.southernperu.com.pe/intranet/documentos/area/revision")
+                    time.sleep(2)
+                    
+                    print("Falta aprobar por administracion")
+                    ##### Notificacion dentro del panel
+                    toaster = ToastNotifier()
+                    toaster.show_toast("TSICAM", str(buscarpordni) + " " + "Falta aprobar por administracion", duration=6)
+
+                    poradministracion.append(buscarpordni)
+                    dfcsc2 = pd.DataFrame(poradministracion)
+                    dfcsc2.columns = ["Por administracion"]
+                    dfcsc2.to_csv("C:\\Users\\REDMIBOOK 16\\Downloads\\prueba\\por_administracion1.csv", index = False, header=True)
+                    
+                else:
+
+                    print("Falta aprobar por administracion")
+                    ##### Notificacion dentro del panel
+                    toaster = ToastNotifier()
+                    toaster.show_toast("TSICAM", str(buscarpordni) + " " + "Falta aprobar por administracion", duration=6)
+                    
+                    #####-------------Captura la pantalla...............##########+
+                    ##os.mkdir("C:\\Users\\REDMIBOOK 16\\Downloads\\prueba\\imagenes1\\")
+                    driver.save_screenshot("C:\\Users\\REDMIBOOK 16\\Downloads\\prueba\\imagenes1\\" + str(buscarpordni) +"_" + "Myimage.png")
+                    driver.get("https://tsicam.southernperu.com.pe/intranet/documentos/area/revision")
+                    time.sleep(2)
+
+                    poradministracion.append(buscarpordni)
+                    dfcsc2 = pd.DataFrame(poradministracion)
+                    dfcsc2.columns = ["Por administracion"]
+                    dfcsc2.to_csv("C:\\Users\\REDMIBOOK 16\\Downloads\\prueba\\por_administracion.csv", index = False, header=True)
+                    
+                    driver.get("https://tsicam.southernperu.com.pe/intranet/documentos/area/revision")
+                    time.sleep(2)
+                    
+            else:
+
+                print("No esta en sistema")
+                ##### Notificacion dentro del panel
+                toaster = ToastNotifier()
+                toaster.show_toast("TSICAM", str(buscarpordni) + " " + "No esta en sistema", duration=6)
+
+                driver.get("https://tsicam.southernperu.com.pe/intranet/documentos/area/revision")
+                time.sleep(2)
+                
+                nosistema.append(buscarpordni)
+                dfcsc3 = pd.DataFrame(nosistema)
+                dfcsc3.columns = ["No sistema"]
+                dfcsc3.to_csv("C:\\Users\\REDMIBOOK 16\\Downloads\\prueba\\no_sistema.csv", index = False, header=True)
+            
     
     driver.find_element(by=By.NAME, value="nombre").clear()
     time.sleep(3)
+
+
 
 
     
